@@ -1,0 +1,35 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace Api.Core.Dtos
+{
+    public class UsuarioAuth 
+    {
+        public string user_id { get; set; }
+        public string email { get; set; }
+        public bool blocked { get; set; }
+        public string given_name { get; set; }
+        public string family_name { get; set; }
+        public string name { get; set; }
+        public DateTime created_at { get; set; }
+        public UserMetadata user_metadata { get; set; }
+        public int logins_count { get; set; }
+        public string created
+        {
+            get {
+                return $"{this.created_at.ToShortDateString()} {this.created_at.ToShortTimeString()}";
+            }
+        }
+
+        public string CompanyName { get; set; }
+    }
+
+    public class UserProfile
+    {
+        public string sub { get; set; }
+        public string given_name { get; set; }
+        public string family_name { get; set; }
+    }
+}
