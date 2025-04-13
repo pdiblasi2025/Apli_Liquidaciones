@@ -4,6 +4,7 @@ using Api.Core.Entities;
 using Api.Core.Enums;
 using Api.Core.Repositories;
 using Api.Core.Services.Interfaces;
+using DocumentFormat.OpenXml.Presentation;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -20,6 +21,7 @@ namespace Api.Core.Services.Implementations
         private readonly IOmsSyncLogService _omsSyncLogService;
         private static CultureInfo _culture = CultureInfo.CreateSpecificCulture("en-US");
         private static NumberStyles _style = NumberStyles.Number;
+        //private static DateTime FechaLiquidable;
 
         public OmsEnvioService(MyContext dbContext, IOmsService omsService, IOmsSyncLogService omsSyncLogService)
         {
@@ -28,13 +30,9 @@ namespace Api.Core.Services.Implementations
             _omsSyncLogService = omsSyncLogService;
         }
 
-        public async Task Sync(DateTime dateFrom, DateTime? dateTo = null)
+        public async Task Sync(DateTime? dateFrom = null, DateTime? dateTo = null)
         {
-            await _omsSyncLogService.AddLogAsync($"Oms Shipping Sync process triggered", OsmJobType.Shipping);
-
-            dateTo ??= DateTime.Now;
-
-            var dates = GetDateTimes(dateFrom, dateTo.Value);
+            await _omsSyncLogService.AddLogAsync($"Oms Envios Sync Inicio el proceso", OsmJobType.Shipping);
 
             try
             {
@@ -54,27 +52,158 @@ namespace Api.Core.Services.Implementations
                     {
                         foreach (var state in deliveryMode.EstadosFacturacion)
                         {
-                            foreach (var date in dates)
-                            {
-                                var clientShippings = await _omsService.GetAllShippingsAsync(new OmsShippingRequestFilter
-                                {
-                                    ClientId = client.OmsId,
-                                    StateId = state,
-                                    DeliveryMode = deliveryMode.MetodoEnvio,
-                                    StateDateFrom = date,
-                                    StateDateTo = date
-                                });
+                            int EstadoFacturable = state;
+                            int ModoDeEnvio = deliveryMode.MetodoEnvio;
 
-                                shippings.AddRange(GetShippings(clientShippings, client, date));
+                            var clientShippings = await _omsService.GetAllShippingsAsync(new OmsShippingRequestFilter
+                            {
+                                ClientId = client.OmsId,
+                                StateId = state,
+                                DeliveryMode = deliveryMode.MetodoEnvio,
+                                StateDateFrom = dateFrom,
+                                StateDateTo = dateTo
+                            });
+                            
+                            
+
+                            foreach (var clientShipping in clientShippings)
+                            {
+                                
+                                String FechaL =  clientShipping.registered;
+
+                                if (ModoDeEnvio == 1) //FIX004
+                                {
+                                    // Condiciones para el Puerta a Puerta
+
+                                    switch (EstadoFacturable)
+                                        {
+                                            case 10:
+                                                FechaL = clientShipping.discharged;
+                                                break;
+                                            case 25:
+                                                FechaL = clientShipping.delivered;
+                                                break;
+                                            case 26:
+                                                FechaL = clientShipping.not_delivered;
+                                                break;
+                                            case 51:
+                                                FechaL = clientShipping.discharged;
+                                                break;
+                                            case 69:
+                                                FechaL = clientShipping.registered;
+                                                break;
+                                        }
+                                }
+                                if (ModoDeEnvio == 4) //FIX004
+                                    {
+                                        // Condiciones para la Logistica Inversa
+
+                                        switch (EstadoFacturable)
+                                        {
+                                            case 10:
+                                                FechaL = clientShipping.discharged;
+                                                break;
+                                            case 25:
+                                                FechaL = clientShipping.delivered;
+                                                break;
+                                            case 26:
+                                                FechaL = clientShipping.not_delivered;
+                                                break;
+                                            case 51:
+                                                FechaL = clientShipping.discharged;
+                                                break;
+                                            case 69:
+                                                FechaL = clientShipping.registered;
+                                                break;
+                                        }
+                                    }
+                                if (ModoDeEnvio == 6)  //FIX004
+                                        {
+                                            // Condiciones para el Puerta a Puerta JU
+
+                                            switch (EstadoFacturable)
+                                            {
+                                                case 10:
+                                                    FechaL = clientShipping.discharged;
+                                                    break;
+                                                case 25:
+                                                    FechaL = clientShipping.delivered;
+                                                    break;
+                                                case 26:
+                                                    FechaL = clientShipping.not_delivered;
+                                                    break;
+                                                case 51:
+                                                    FechaL = clientShipping.discharged;
+                                                    break;
+                                                case 69:
+                                                    FechaL = clientShipping.registered;
+                                                    break;
+                                            }
+                                        }
+                                 
+                                if (ModoDeEnvio == 8)  //RF000
+                                    {
+                                            // Condiciones para el FulfillmentRefrigerado
+
+                                            switch (EstadoFacturable)
+                                            {
+                                                case 10:
+                                                    FechaL = clientShipping.discharged;
+                                                    break;
+                                                case 25:
+                                                    FechaL = clientShipping.delivered;
+                                                    break;
+                                                case 26:
+                                                    FechaL = clientShipping.not_delivered;
+                                                    break;
+                                                case 51:
+                                                    FechaL = clientShipping.discharged;
+                                                    break;
+                                                case 69:
+                                                    FechaL = clientShipping.registered;
+                                                    break;
+                                            }
+                                     }
+
+
+
+                                if (!decimal.TryParse(clientShipping.value, _style, _culture, out decimal value) ||
+                                    !decimal.TryParse(clientShipping.shipping_cost_no_tax, _style, _culture, out decimal shipping_cost_no_tax))
+                                    continue;
+
+                                DateTime fechaFormateada = DateTime.ParseExact(FechaL, "dd/MM/yyyy HH:mm:ss", CultureInfo.InvariantCulture);
+                                
+
+
+                                
+                                shippings.Add(new DetalleLiquidacionPos
+                                {
+                                    ClienteId = client.Id,
+                                    OmsId = clientShipping.id,
+                                    Etiqueta = clientShipping.shipment_id,
+                                    Cantidad = clientShipping.items_quantity,
+                                    Valoritems = value,
+                                    Peso = clientShipping.weight,
+                                    Volumen = clientShipping.volume,
+                                    Ancho = clientShipping.width,
+                                    Largo = clientShipping.length,
+                                    Alto = clientShipping.height,
+                                    ValorSinImpuesto = shipping_cost_no_tax,
+                                    Estado = EstadoItem.PendienteLiquidar,
+                                    Fecha = fechaFormateada, //FIX003
+                                    Enabled = true,
+                                    Deleted = false,
+                                    CreateDate = DateTime.Now,
+                                    CreatedBy = "EnviosJob-fix004"
+                                });
                             }
                         }
                     }
                 }
-
+                // Verifico si hay algun envio en shippings
                 if (shippings.Any())
                 {
-                    var uniqueShippings = shippings.OrderBy(x => x.Fecha)
-                        .GroupBy(x => x.OmsId)
+                    var uniqueShippings = shippings.GroupBy(x => x.OmsId)
                         .Select(x => x.First())
                         .ToList();
 
@@ -87,15 +216,17 @@ namespace Api.Core.Services.Implementations
                         .ToListAsync();
 
                     var newShippings = uniqueShippings.Where(x => !existingIds.Contains(x.OmsId)).ToList();
+                    // Arriba hice la verificacion si el envio ya existia en la base de datos.
 
                     if (newShippings.Any())
-                        await _omsSyncLogService.AddLogAsync($"{newShippings.Count} shipping(s) will be added", OsmJobType.Shipping);
-
-                    await _dbContext.AddRangeAsync(newShippings);
-                    await _dbContext.SaveChangesAsync();
+                        await _omsSyncLogService.AddLogAsync($"{newShippings.Count} Envio(s) encontrados", OsmJobType.Shipping);
+                    
+                    // Sino exite en la base lo grabo.
+                    await _dbContext.AddRangeAsync(newShippings); // inserto los datos a la base
+                    await _dbContext.SaveChangesAsync(); //Grabo async los datos en la base
                 }
 
-                await _omsSyncLogService.AddLogAsync("Oms Shipping Sync process finished", OsmJobType.Shipping);
+                await _omsSyncLogService.AddLogAsync("Oms Envios Sync a finalizado", OsmJobType.Shipping);
 
             }
             catch (Exception ex)
@@ -104,51 +235,55 @@ namespace Api.Core.Services.Implementations
             }
         }
 
-        private List<DetalleLiquidacionPos> GetShippings(List<OmsShippingDto> clientShippings, Cliente client, DateTime date)
-        {
-            var shippings = new List<DetalleLiquidacionPos>();
+        //psd
+        //private List<DetalleLiquidacionPos> GetShippings(List<OmsShippingDto> clientShippings, Cliente client, DateTime date)
+        //{
+        //    var shippings = new List<DetalleLiquidacionPos>();
 
-            foreach (var clientShipping in clientShippings)
-            {
-                if (!decimal.TryParse(clientShipping.value, _style, _culture, out decimal value) ||
-                    !decimal.TryParse(clientShipping.shipping_cost, _style, _culture, out decimal shippingCost))
-                    continue;
+        //    foreach (var clientShipping in clientShippings)
+        //    {
+        //        if (!decimal.TryParse(clientShipping.value, _style, _culture, out decimal value) ||
+        //            !decimal.TryParse(clientShipping.shipping_cost_no_tax, _style, _culture, out decimal shipping_cost_no_tax))
+        //            continue;
 
-                shippings.Add(new DetalleLiquidacionPos
-                {
-                    ClienteId = client.Id,
-                    OmsId = clientShipping.id,
-                    Etiqueta = clientShipping.shipment_id,
-                    Cantidad = clientShipping.items_quantity,
-                    Valoritems = value,
-                    Peso = clientShipping.weight,
-                    Volumen = clientShipping.volume,
-                    Ancho = clientShipping.width,
-                    Largo = clientShipping.length,
-                    Alto = clientShipping.height,
-                    ValorSinImpuesto = shippingCost,
-                    Estado = EstadoItem.PendienteLiquidar,
-                    Fecha = date,
-                    Enabled = true,
-                    Deleted = false,
-                    CreateDate = DateTime.Now,
-                    CreatedBy = "ShippingJob"
-                });
-            }
+        //        shippings.Add(new DetalleLiquidacionPos
+        //        {
+        //            ClienteId = client.Id,
+        //            OmsId = clientShipping.id,
+        //            Etiqueta = clientShipping.shipment_id,
+        //            Cantidad = clientShipping.items_quantity,
+        //            Valoritems = value,
+        //            Peso = clientShipping.weight,
+        //            Volumen = clientShipping.volume,
+        //            Ancho = clientShipping.width,
+        //            Largo = clientShipping.length,
+        //            Alto = clientShipping.height,
+        //            ValorSinImpuesto = shipping_cost_no_tax,
+        //            Estado = EstadoItem.PendienteLiquidar,
+        //            Fecha = date,
+        //            Enabled = true,
+        //            Deleted = false,
+        //            CreateDate = DateTime.Now,
+        //            CreatedBy = "ShippingJob"
+        //        });
+        //    }
 
-            return shippings;
-        }
+        //    return shippings;
+        //}
 
-        private List<DateTime> GetDateTimes(DateTime start, DateTime end)
-        {
-            var dates = new List<DateTime>();
+        //private List<DateTime> GetDateTimes(DateTime start, DateTime end)
+        //{
+        //    var dates = new List<DateTime>();
 
-            for (DateTime date = start; date <= end; date = date.AddDays(1))
-            {
-                dates.Add(date);
-            }
+        //    for (DateTime date = start; date <= end; date = date.AddDays(1))
+        //    {
+        //        dates.Add(date);
+        //    }
 
-            return dates;
-        }
+        //    return dates;
+        //}
+
+        //psd
+
     }
 }

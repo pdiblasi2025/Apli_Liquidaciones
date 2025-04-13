@@ -18,7 +18,7 @@ namespace Api.Core.Admin
     public class AuthAdmin
     {
         private readonly string _authority;
-        //private readonly string _token;
+        private readonly string _token;
         private readonly string _clientId;
         private readonly string _clientSecret;
         private readonly string _namespace;
@@ -62,6 +62,7 @@ namespace Api.Core.Admin
 
         public IRestResponse GetUserProfile(string token)
         {
+
             var client = new RestClient($"{_authority}/userinfo");
             var request = new RestRequest(Method.GET);
             request.AddHeader("authorization", $"Bearer {token}");

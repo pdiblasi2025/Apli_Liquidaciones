@@ -71,6 +71,7 @@ namespace Api.Core.Controllers
         [HttpPost("SyncOms")]
         public async Task<IActionResult> SyncOms([FromBody] SyncOmsEnvioRequest request)
         {
+            //PSD validacion de la fecha
             if (request.DateTimeTo != null && request.DateTimeTo < request.DateTimeFrom)
                 return BadRequest("La fecha hasta no puede ser menor que la fecha desde");
 

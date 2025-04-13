@@ -3,6 +3,8 @@
     public enum MetodoEnvio
     {
         PuertaAPuerta = 1,
-        LogisticaInversa = 4
-    }
+        LogicaInversa = 4,
+        PuertaAPuertaJu = 6,
+        FulfillmentRefrigerado = 8
+}
 }

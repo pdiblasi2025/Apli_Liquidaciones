@@ -59,6 +59,9 @@ namespace Api.Core.Services.Implementations
 
                         var codigosSeguimiento = clientOrder.orders.Where(x => !string.IsNullOrEmpty(x.tracking_id)).Select(x => x.tracking_id).ToList();
 
+
+
+
                         orders.Add(new DetalleLiquidacionPre
                         {
                             ClienteId = client.Id,
@@ -70,11 +73,13 @@ namespace Api.Core.Services.Implementations
                             IdPreferenciaMP = clientOrder.preference_id,
                             ValorSinImpuesto = amountNoTax,
                             Estado = EstadoItem.PendienteLiquidar,
-                            Fecha = DateTime.TryParseExact(clientOrder.date, "dd/MM/yyyy", null, DateTimeStyles.None, out DateTime fecha) ? fecha : DateTime.Now,
+                            //Fecha = DateTime.TryParseExact(clientOrder.date, "dd/MM/yyyy", null, DateTimeStyles.None, out DateTime fecha) ? fecha : DateTime.Now,
+                            //PSD FIX003 - Aca debe guardar la fecha date_approved
+                            Fecha = DateTime.TryParseExact(clientOrder.date_approved, "dd/MM/yyyy", null, DateTimeStyles.None, out DateTime fecha) ? fecha : DateTime.Now,
                             Enabled = true,
                             Deleted = false,
                             CreateDate = DateTime.Now,
-                            CreatedBy = "OrderJob"
+                            CreatedBy = "OrderJobFIX003"
                         });
                     }
                 }

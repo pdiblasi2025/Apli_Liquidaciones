@@ -22,18 +22,18 @@ namespace Api.Core.Dtos
         public decimal ValorSinImpuesto { get; set; }
     }
 
-	public class DetalleLiquidacionPreOms
-	{
-		public int IdLiquidacion { get; set; }
-        public string IdClienteOMS { get; set; }
-        public string CodigoOrdenPago { get; set; }
-		public int IdMercadoPago { get; set; }
-		public string Urlpago { get; set; }
-		public int IdPreferenciaMP { get; set; }
-		public string CallbackasociadoMP { get; set; }
-		public int IdOrdenPago { get; set; }
-		public decimal OtrosGastos { get; set; }
-		public EstadoItem Estado { get; set; }
-		public decimal ValorSinImpuesto { get; set; }
-	}
+	//public class DetalleLiquidacionPreOms
+	//{
+	//	public int IdLiquidacion { get; set; }
+ //       public string IdClienteOMS { get; set; }
+ //       public string CodigoOrdenPago { get; set; }
+	//	public int IdMercadoPago { get; set; }
+	//	public string Urlpago { get; set; }
+	//	public int IdPreferenciaMP { get; set; }
+	//	public string CallbackasociadoMP { get; set; }
+	//	public int IdOrdenPago { get; set; }
+	//	public decimal OtrosGastos { get; set; }
+	//	public EstadoItem Estado { get; set; }
+	//	public decimal ValorSinImpuesto { get; set; }
+	//}
 }

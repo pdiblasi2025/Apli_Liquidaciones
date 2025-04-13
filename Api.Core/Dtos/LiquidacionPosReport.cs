@@ -14,7 +14,7 @@ namespace Api.Core.Dtos
 		[ExportableToExcel("Fecha", 1)]
 		public string Fecha { get; set; }
 
-		[ExportableToExcel("Cliente", 2)]
+		[ExportableToExcel("Razón social", 2)]
 		public string Cliente { get; set; }
 
 		[ExportableToExcel("Etiqueta", 3)]

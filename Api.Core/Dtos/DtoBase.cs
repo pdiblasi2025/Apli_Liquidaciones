@@ -17,6 +17,8 @@ namespace Api.Core.Dtos
         public string CreatedBy { get; set; }
         public string UpdatedBy { get; set; }
         public string DeleteBy { get; set; }
+        //PSD
+        //public bool Fecha_Appro { get; set; }
 
         public bool Enabled { get; set; }
         public bool Deleted { get; set; }

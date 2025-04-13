@@ -26,7 +26,7 @@ namespace Api.Core.Services.Implementations
                        .AsNoTracking()
                        .ToListAsync();
 
-            var items = erpResponse.Where(x => !tipoImpuesto.Any(cp => cp.TaxTypeID == x.TaxTypeID)).ToList();
+            var items = erpResponse.Where(x => !tipoImpuesto.Any(cp => cp.TaxTypeID != x.TaxTypeID)).ToList();
 
             foreach (var item in items)
             {

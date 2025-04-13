@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System.Collections.Generic;
 using System.Net;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 
 namespace Api.Core.Controllers
@@ -23,11 +24,13 @@ namespace Api.Core.Controllers
     {
         private const string ApiKey = "X-API-Key";
         private readonly string _apiKeyValue;
-
+        
         public LiquidacionesController(MyContext context, IOptions<AppSettings> appSettings, IErpMilongaInvoiceService erpMilongaService) : base(context, appSettings.Value)
         {
             _admin.ErpMilongaInvoiceService = erpMilongaService;
             _apiKeyValue = appSettings.Value.ApiKey;
+            
+            
         }
 
         //[Authorize(Roles = "Administracion,Socio,SuperAdmin")]
@@ -72,6 +75,9 @@ namespace Api.Core.Controllers
 
             return Ok();
         }
+
+        
+
 
         [HttpDelete("{id}/Concepto/{conceptoId}")]
         public async Task<IActionResult> AnularConceptoAsync(int id, int conceptoId)
@@ -138,10 +144,12 @@ namespace Api.Core.Controllers
         [HttpPut("{id}/Facturacion")]
         public async Task<IActionResult> DatosFacturacion(int id, [FromBody] LiquidacionDatosFacturacionRequest datosFacturacionRequest)
         {
-            if (!HttpContext.Request.Headers.TryGetValue(ApiKey, out var extractedApiKey))
-                return Unauthorized();
 
-            if (!_apiKeyValue.Equals(extractedApiKey))
+
+            if (!HttpContext.Request.Headers.TryGetValue(ApiKey, out var extractedApiKey))
+                return Unauthorized(); //aca valido que envia el api key
+
+            if (!_apiKeyValue.Equals(extractedApiKey)) // valido que sea igual al set en el codigo
                 return Unauthorized();
 
             var response = await _admin.UpdateDatosFacturacion(id, datosFacturacionRequest);

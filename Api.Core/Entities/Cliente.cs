@@ -13,7 +13,10 @@ namespace Api.Core.Entities
         public string NombreUsuario { get; set; }
         public string RazonSocial { get; set; }
         public string Nombre { get; set; }
+        //PSD
         public string RazonSocialNombre { get => !string.IsNullOrEmpty(RazonSocial) ? RazonSocial : Nombre; }
+        //public string Apellido { get; set; }
+        //public string RazonSocialNombre { get => !string.IsNullOrEmpty(RazonSocial) ? RazonSocial : $"{Nombre} {Apellido}"; }
 
         public string EstadosFacturacion
         {

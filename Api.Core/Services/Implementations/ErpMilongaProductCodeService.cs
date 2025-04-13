@@ -27,8 +27,7 @@ namespace Api.Core.Services.Implementations
                        .AsNoTracking()
                        .ToListAsync();
 
-            var items = erpResponse.Where(x => !codigosProducto
-                    .Any(cp => string.Compare(cp.ProductCode, x.ProductCode, StringComparison.OrdinalIgnoreCase) == 0)).ToList();
+            var items = erpResponse.Where(x => !codigosProducto.Any(cp => string.Compare(cp.ProductCode, x.ProductCode, StringComparison.OrdinalIgnoreCase) != 0)).ToList();
 
             foreach (var item in items)
             {

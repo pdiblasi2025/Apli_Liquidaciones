@@ -55,7 +55,7 @@ namespace Api.Core
 
             services.AddMvc(options =>
             {
-                options.RespectBrowserAcceptHeader = true; // false by default
+                options.RespectBrowserAcceptHeader = false; // false by default
             })
             .AddNewtonsoftJson(options => {
                 options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
@@ -63,11 +63,13 @@ namespace Api.Core
 
             services.AddSwaggerGen(c =>
             {
+                
                 c.SwaggerDoc("v1", new OpenApiInfo
                 {
-                    Version = "v1",
-                    Title = "IFlow.Liquidacion API.Core Service",
-                    Description = "API for IFlow.Liquidacion",
+                    Version = "v1.2",
+                    Title = "IFlow API sistema de Liquidaciones",
+                    Description = "API para el sistema de liquidaciones" +
+                    "",
                 });
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
@@ -163,60 +165,74 @@ namespace Api.Core
             services.AddQuartz(q =>
             {
                 q.UseMicrosoftDependencyInjectionJobFactory();
-
-                var clientJobKey = new JobKey("ClientJob");
-
-                q.AddJob<ClientJob>(opts => opts.WithIdentity(clientJobKey));
-
-                q.AddTrigger(opts => opts
-                    .ForJob(clientJobKey)
-                    .WithIdentity("ClientJob-trigger")
-                    .WithCronSchedule(Configuration["Oms:ClientJobCron"]));
-
-                var startAt = DateTimeOffset.ParseExact("02/05/2023 00:00:00 -03:00",
+                var startAt = DateTimeOffset.ParseExact("01/01/2025 00:00:00 -03:00",
                                  "dd/MM/yyyy HH:mm:ss zzz",
                                  CultureInfo.InvariantCulture);
 
-                var orderJobKey = new JobKey("OrderJob");
 
-                q.AddJob<OrderJob>(opts => opts.WithIdentity(orderJobKey));
+                if (Configuration.GetValue<bool>("EnableJobs:ClientJob"))
+                {
+                    var clientJobKey = new JobKey("ClientJob");
+                    q.AddJob<ClientJob>(opts => opts.WithIdentity(clientJobKey));
+                    q.AddTrigger(opts => opts
+                        .ForJob(clientJobKey)
+                        .WithIdentity("ClientJob-trigger")
+                        .StartAt(startAt)
+                        .WithCronSchedule(Configuration["Oms:ClientJobCron"]));
+                }
 
-                q.AddTrigger(opts => opts
-                    .ForJob(orderJobKey)
-                    .WithIdentity("OrderJob-trigger")
-                    .StartAt(startAt)
-                    .WithSchedule(CronScheduleBuilder.CronSchedule(Configuration["Oms:OrderJobCron"])));
+                //var startAt = DateTimeOffset.ParseExact("01/01/2025 00:00:00 -03:00",
+                //               "dd/MM/yyyy HH:mm:ss zzz",
+                //                CultureInfo.InvariantCulture);
+           
+                if (Configuration.GetValue<bool>("EnableJobs:OrderJob"))
+                {
+                    var orderJobKey = new JobKey("OrderJob");
+                    q.AddJob<OrderJob>(opts => opts.WithIdentity(orderJobKey));
+                    q.AddTrigger(opts => opts
+                        .ForJob(orderJobKey)
+                        .WithIdentity("OrderJob-trigger")
+                        .StartAt(startAt)
+                        .WithSchedule(CronScheduleBuilder.CronSchedule(Configuration["Oms:OrderJobCron"])));
+                }
 
-                var shippingJobKey = new JobKey("ShippingJob");
 
-                q.AddJob<ShippingJob>(opts => opts.WithIdentity(shippingJobKey));
+             
+                if (Configuration.GetValue<bool>("EnableJobs:ShippingJob"))
+                {
+                    var shippingJobKey = new JobKey("ShippingJob");
+                    q.AddJob<ShippingJob>(opts => opts.WithIdentity(shippingJobKey));
+                    q.AddTrigger(opts => opts
+                        .ForJob(shippingJobKey)
+                        .WithIdentity("ShippingJob-trigger")
+                        .StartAt(startAt)
+                        .WithSchedule(CronScheduleBuilder.CronSchedule(Configuration["Oms:ShippingJobCron"])));
+                };
 
-                q.AddTrigger(opts => opts
-                    .ForJob(shippingJobKey)
-                    .WithIdentity("ShippingJob-trigger")
-                    .StartAt(startAt)
-                    .WithSchedule(CronScheduleBuilder.CronSchedule(Configuration["Oms:ShippingJobCron"])));
+                if (Configuration.GetValue<bool>("EnableJobs:ErpMilongaMasterJob"))
+                {
+                    var erpMasterobKey = new JobKey("ErpMilongaMasterJob");
 
-                var erpMasterobKey = new JobKey("ErpMilongaMasterJob");
+                    q.AddJob<ErpMilongaMasterJob>(opts => opts.WithIdentity(erpMasterobKey));
 
-                q.AddJob<ErpMilongaMasterJob>(opts => opts.WithIdentity(erpMasterobKey));
+                    q.AddTrigger(opts => opts
+                        .ForJob(erpMasterobKey)
+                        .WithIdentity("ErpMilongaMasterJob-trigger")
+                       .WithCronSchedule(Configuration["Erp:MasterJobCron"]));
 
-                q.AddTrigger(opts => opts
-                    .ForJob(erpMasterobKey)
-                    .WithIdentity("ErpMilongaMasterJob-trigger")
-                   .WithCronSchedule(Configuration["Erp:MasterJobCron"]));
+                }
+
+                services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
+
             });
-
-            services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
-
         }
- 
+
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             using (var scope = app.ApplicationServices.CreateScope())
             {
                 var context = scope.ServiceProvider.GetService<MyContext>();
-
+                //PSD
                 context.Database.Migrate();
             }
 
@@ -230,7 +246,8 @@ namespace Api.Core
                 app.UseSwagger();
                 app.UseSwaggerUI(c =>
                 {
-                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "IFlow Liquidacion API V1");
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "API sistema de Liquidaciones V1.2");
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "API Sistema de Liquidaciones Externos V1.0");
                     c.RoutePrefix = string.Empty;
                 });
             }

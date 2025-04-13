@@ -15,9 +15,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Comprobante = Api.Core.Entities.Comprobante;
-using ConceptoLiquidacion = Api.Core.Entities.ConceptoLiquidacion;
-using Liquidacion = Api.Core.Entities.Liquidacion;
 
 namespace Api.Core.Admin
 {
@@ -82,7 +79,39 @@ namespace Api.Core.Admin
 
             await MyContext.SaveChangesAsync();
         }
- 
+      /*  
+      // Aca debo traer la imformacion para enviar PSD ************
+        public async Task<List<Dtos.LiquidacionDetalle>> GetDetalleLiquidacion(int liquidacionId)
+        {
+
+            var Detalleliquidacion = await MyContext.Liquidaciones.AsNoTracking()
+            .Include(MyContext.GetIncludePaths(typeof(Detalleliquidacion)))
+            .Where(x => x.Id == liquidacionId)
+            .ToListAsync();
+
+            return Detalleliquidacion.SelectMany(x => x.Conceptos.Select(y => new Dtos.LiquidacionDetalle
+            {
+                Id = x.Id,
+                Fecha = x.CreateDate.ToLongDateString(),
+                Cliente = x.Cliente?.RazonSocialNombre ?? string.Empty,
+                Descripcion = x.Descripcion,
+                Saldo = x.Saldo,
+                Estado = EnumHelper.GetDescription(x.Estado),
+                Factura = x.Factura,
+                OtrosComprobantes = x.OtrosComprobantes,
+                NumeroFactura = x.NumeroFactura,
+                MontoTotalImpuestos = x.MontoTotalImpuestos,
+                MontoFinalFactura = x.MontoFinalFactura,
+                ConceptoObservacion = y.Observacion,
+                ConceptoMonto = y.Monto
+            })).ToList();
+
+
+        }
+
+        */
+        // *************************
+
         public async Task<Dtos.ComprobanteDownload> GetComprobante(int id, int archivoId)
         {
             var entity = await MyContext.Liquidaciones.Include(MyContext.GetIncludePaths(typeof(Liquidacion))).SingleAsync(e => e.Id == id);

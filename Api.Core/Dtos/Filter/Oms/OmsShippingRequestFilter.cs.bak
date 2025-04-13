@@ -1,7 +1,6 @@
 ﻿using System;
 using Newtonsoft.Json;
 
-
 namespace Api.Core.Dtos.Filter.Oms
 {
     public class OmsShippingRequestFilter

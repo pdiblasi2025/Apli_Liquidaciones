@@ -27,8 +27,7 @@ namespace Api.Core.Controllers
 
 
         [HttpGet("liquidacion")]
-        //public async Task<ActionResult<List<DetalleLiquidacionPre>>> GetAsync([FromQuery] int id)
-        public async Task<ActionResult<List<Dtos.DetalleLiquidacionPre>>> GetAsync([FromQuery] int id)
+        public async Task<ActionResult<List<DetalleLiquidacionPre>>> GetAsync([FromQuery] int id)
         {
             return await _admin.GetByLiquidacionAsync(id);
         }

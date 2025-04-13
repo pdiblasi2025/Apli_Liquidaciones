@@ -27,22 +27,24 @@ namespace Api.Core.Services.Implementations
                 {
                     OrderCode = liquidacion.Id.ToString(),
                     OrderDate = liquidacion.CreateDate,
-                    Remarks = liquidacion.Descripcion,
+                    Remarks = liquidacion.Descripcion, // PSD Sumar 
                     OrderTypeID = "01",
                     StoreID = "",
-                    PaymentMethodID = liquidacion.Cliente.CondicionPago.ErpId,
                     Payment = GetPayments(liquidacion),
                     Customer = new InvoiceCustomerDto
                     {
                         CustomerCode = liquidacion.Cliente.OmsId.ToString(),
                         FirstName = liquidacion.Cliente.RazonSocial ?? liquidacion.Cliente.Nombre,
-                        LastName = !string.IsNullOrEmpty(liquidacion.Cliente.RazonSocial) ? "" : liquidacion.Cliente.Nombre,
+                        //PSD
+                        LastName = !string.IsNullOrEmpty(liquidacion.Cliente.RazonSocial) ? " " : liquidacion.Cliente.Nombre,
                         Telephone = liquidacion.Cliente.Telefono,
-                        Email = liquidacion.Cliente.Email ?? string.Empty
+                        Email = liquidacion.Cliente.Email
                     },
                     BillingAddress = new InvoiceBillingAddressDto
                     {
-                        BusinessName = liquidacion.Cliente.RazonSocialNombre,
+                        //PSD
+                        //BusinessName = liquidacion.Cliente.RazonSocial ?? $"{liquidacion.Cliente.Nombre} {liquidacion.Cliente.Apellido}",
+                        BusinessName = liquidacion.Cliente.RazonSocial ?? $"{liquidacion.Cliente.Nombre}",
                         TaxTypeID = liquidacion.Cliente.TipoImpuesto.TaxTypeID,
                         IdentificationType = liquidacion.Cliente.TipoDocumento.IdentificationTypeID,
                         IdentificationCode = liquidacion.Cliente.NumeroDeDocumento,
@@ -53,7 +55,7 @@ namespace Api.Core.Services.Implementations
                         Appartment = liquidacion.Cliente.Depto,
                         ZipCode = liquidacion.Cliente.CodigoPostal,
                         Telephone = liquidacion.Cliente.Telefono,
-                        Email = liquidacion.Cliente.Email ?? string.Empty
+                        Email = liquidacion.Cliente.Email
                     },
                     Tax = liquidacion.Cliente.Impuestos.Any() ? liquidacion.Cliente.Impuestos.Select(x => new InvoiceTaxDto
                     {

@@ -46,10 +46,20 @@ namespace Api.Core.Jobs
                         RazonSocial = x.company_name,
                         NumeroDeDocumento = x.client_cuit,
                         TipoCliente = x.prepaid.Value ? TipoCliente.Prepago : TipoCliente.Pospago,
+                        NombreUsuario = x.username,
                         CreateDate = DateTime.Now,
-                        CreatedBy = "ClientJob",
+                        CreatedBy = "PsdClientJob",
                         Enabled = true,
-                        Deleted = false
+                        Deleted = false 
+                        
+                        //PSD
+                        //NumeroDeDocumento = x.cuit,
+                        //Nombre = x.first_name,
+                        //Apellido = x.last_name,
+                        //Email = x.email,
+                        //Telefono = x.phone,
+                        
+
                     }).ToList();
 
                 if (clientsToInsert.Any())
@@ -57,6 +67,36 @@ namespace Api.Core.Jobs
                     await _omsSyncLogService.AddLogAsync($"{clientsToInsert.Count} client(s) will be added", OsmJobType.Client);
                     _dbContext.AddRange(clientsToInsert);
                 }
+                //PSD
+                //int clientsToUpdateCount = 0;
+
+                //foreach (var currentClient in currentClients)
+                //{
+                //    var omsClient = omsClients.FirstOrDefault(x => x.id == currentClient.OmsId && x.prepaid.HasValue);
+
+                //    if (omsClient == null)
+                //        continue;
+
+                //    if (HasClientChanged(currentClient, omsClient))
+                //    {
+                //        currentClient.RazonSocial = omsClient.company_name;
+                //        currentClient.NumeroDeDocumento = omsClient.cuit;
+                //        currentClient.Nombre = omsClient.first_name;
+                //        currentClient.Apellido = omsClient.last_name;
+                //        currentClient.Email = omsClient.email;
+                //        currentClient.Telefono = omsClient.phone;
+                //        currentClient.TipoCliente = omsClient.prepaid.Value ? TipoCliente.Prepago : TipoCliente.Pospago;
+                //        currentClient.NombreUsuario = omsClient.username;
+                //        currentClient.UpdateDate = DateTime.Now;
+
+                //        clientsToUpdateCount++;
+                //    }
+                //}
+
+                //if (clientsToUpdateCount > 0)
+                //{
+                //    await _omsSyncLogService.AddLogAsync($"{clientsToUpdateCount} client(s) will be updated", OsmJobType.Client);
+                //}
 
                 await _dbContext.SaveChangesAsync();
 
@@ -66,6 +106,19 @@ namespace Api.Core.Jobs
             {
                 await _omsSyncLogService.AddLogAsync($"Error when running Oms Client Sync process - {ex.Message}", OsmJobType.Client);
             }
+        //PSD
+        //}
+
+        //private bool HasClientChanged(Cliente a, OmsClientDto b)
+        //{
+        //    return string.Compare(a.RazonSocial, b.company_name) != 0 ||
+        //           string.Compare(a.NumeroDeDocumento, b.cuit) != 0 ||
+        //           string.Compare(a.Nombre, b.first_name) != 0 ||
+        //           string.Compare(a.Apellido, b.last_name) != 0 ||
+        //           string.Compare(a.Email, b.email) != 0 ||
+        //           string.Compare(a.Telefono, b.phone) != 0 ||
+        //           string.Compare(a.NombreUsuario, b.username) != 0 ||
+        //           (a.TipoCliente != (b.prepaid.Value ? TipoCliente.Prepago : TipoCliente.Pospago));
         }
     }
 }

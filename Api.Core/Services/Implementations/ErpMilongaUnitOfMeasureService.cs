@@ -26,7 +26,7 @@ namespace Api.Core.Services.Implementations
                        .AsNoTracking()
                        .ToListAsync();
 
-            var items = erpResponse.Where(x => !unidadesDeMedida.Any(cp => cp.UnitOfMeasureID == x.UnitOfMeasureID)).ToList();
+            var items = erpResponse.Where(x => !unidadesDeMedida.Any(cp => cp.UnitOfMeasureID != x.UnitOfMeasureID)).ToList();
 
             foreach (var item in items)
             {

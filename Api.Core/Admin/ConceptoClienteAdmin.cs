@@ -18,12 +18,19 @@ namespace Api.Core.Admin
                 .OrderByDescending(x => x.UpdateDate)
                 .AsNoTracking();
 
+            //query = query.Where(e => (string.IsNullOrEmpty(filter.MultiColumnSearchText) || (e.Cliente.RazonSocial.Contains(filter.MultiColumnSearchText, StringComparison.InvariantCultureIgnoreCase) ||
+            //                                                                                (e.Cliente.Nombre + ' ' + e.Cliente.Apellido).Contains(filter.MultiColumnSearchText, StringComparison.OrdinalIgnoreCase) ||
+            //                                                                                (e.Cliente.Apellido + ' ' + e.Cliente.Nombre).Contains(filter.MultiColumnSearchText, StringComparison.OrdinalIgnoreCase))) &&
+            //                         (filter.FechaDesde == null || e.UpdateDate >= filter.FechaDesde.Value.Date) &&
+            //                         (filter.FechaHasta == null || e.UpdateDate <= filter.FechaHasta.Value.Date));
+            //PSD
             query = query.Where(e => (string.IsNullOrEmpty(filter.MultiColumnSearchText) ||
                                      e.Cliente.RazonSocial.Contains(filter.MultiColumnSearchText, StringComparison.InvariantCultureIgnoreCase) ||
                                      e.Cliente.Nombre.Contains(filter.MultiColumnSearchText, StringComparison.OrdinalIgnoreCase)) &&
                                      (filter.FechaDesde == null || e.UpdateDate >= filter.FechaDesde.Value.Date) &&
                                      (filter.FechaHasta == null || e.UpdateDate <= filter.FechaHasta.Value.Date));
-                        
+
+
             return query;          
         }
 

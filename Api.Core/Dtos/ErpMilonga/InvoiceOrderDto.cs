@@ -12,7 +12,9 @@ namespace Api.Core.Dtos.ErpMilonga
         public string Remarks { get; set; }
         public string OrderTypeID { get; set; }
         public string StoreID { get; set; }
+        //PSD
         public string PaymentMethodID { get; set; }
+        //
         public List<InvoicePaymentDto> Payment { get; set; }
         public InvoiceCustomerDto Customer { get; set; }
         public InvoiceBillingAddressDto BillingAddress { get; set; }

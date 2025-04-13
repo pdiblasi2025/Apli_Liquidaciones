@@ -4,6 +4,8 @@
     {
         public int id { get; set; }
         public string date { get; set; }
+        //PSD
+        public string date_approved { get; set; }
         public string element_id { get; set; }
         public string preference_id { get; set; }
         public string init_point { get; set; }

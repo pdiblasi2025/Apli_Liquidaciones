@@ -15,13 +15,9 @@ namespace Api.Core.Admin
     {
         public override IQueryable GetQuery(FilterDetalleLiquidacionPre filter)
         {
-            var query = MyContext.DetalleLiquidacionPre
-            			.Include(x => x.Cliente)
-            			.OrderByDescending(x => x.Fecha)
-            			.AsQueryable();
+            var query = MyContext.DetalleLiquidacionPre.Include(x => x.Cliente).OrderByDescending(x => x.Fecha).AsQueryable();
 
-            query = query.Where
-            (e =>
+            query = query.Where(e =>
                !e.Deleted &&
                (filter.ClienteId == null || e.ClienteId == filter.ClienteId) &&
                (filter.Fecha_Desde == null || e.Fecha.Date >= filter.Fecha_Desde.Value.Date) &&

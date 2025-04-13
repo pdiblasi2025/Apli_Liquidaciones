@@ -31,6 +31,8 @@ namespace Api.Core.Jobs
                     .FirstOrDefaultAsync();
 
                 var dateFrom = latestEntry?.CreateDate.AddDays(-2) ?? DateTime.Now.AddDays(-1);
+                //PSD esta es la fecha de importacion ??? 
+
 
                 await _omsOrdenService.Sync(dateFrom);
 

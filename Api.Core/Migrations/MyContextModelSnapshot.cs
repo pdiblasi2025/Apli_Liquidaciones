@@ -26,6 +26,9 @@ namespace Api.Core.Migrations
                     b.Property<int?>("Altura")
                         .HasColumnType("int");
 
+                    b.Property<string>("Apellido")
+                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+
                     b.Property<string>("Calle")
                         .HasColumnType("longtext CHARACTER SET utf8mb4");
 

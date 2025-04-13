@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using System.IdentityModel.Tokens.Jwt;
 using Api.Core.Dtos.Request;
+using Newtonsoft.Json.Linq;
 
 namespace Api.Core.Controllers
 {
@@ -44,6 +45,21 @@ namespace Api.Core.Controllers
             }
             return Json($"Status code: {response.StatusCode}. {response.ErrorMessage}");
         }
+
+        //[HttpGet]
+        //[Route("GetToken")]
+        //public IActionResult GetToken()
+        //{
+        //    var response = GetManagementAPIToken();
+
+        //    if (response.StatusCode == System.Net.HttpStatusCode.OK)
+        //    {
+        //        return Json(response.Content);
+        //    }
+        //    return Json($"Status code: {response.StatusCode}. {response.ErrorMessage}");
+        //}
+
+
 
         [HttpGet]
         [Route("GetUsers")]
@@ -192,7 +208,7 @@ namespace Api.Core.Controllers
         public async Task<JsonResult> testToken(string userId)
         {
             var accessToken = await HttpContext.GetTokenAsync("access_token");
-
+            
             var user = _authAdmin.GetCurrentUser(accessToken);
 
             return Json(accessToken);

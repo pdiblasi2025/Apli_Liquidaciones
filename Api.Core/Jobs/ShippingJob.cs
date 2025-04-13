@@ -30,11 +30,9 @@ namespace Api.Core.Jobs
                     .OrderByDescending(x => x.CreateDate)
                     .FirstOrDefaultAsync();
 
-                var dateFrom = latestEntry?.CreateDate.AddDays(-2) ?? DateTime.Now.AddDays(-2);
+                var dateFrom = latestEntry?.CreateDate.AddDays(-2) ?? DateTime.Now.AddDays(-1);
 
-                var dateTo = DateTime.Now.AddDays(-1);
-
-                await _omsEnvioService.Sync(dateFrom, dateTo);
+                await _omsEnvioService.Sync(dateFrom);
 
                 _firstRun = false;
             }
@@ -42,9 +40,7 @@ namespace Api.Core.Jobs
             {
                 var dateFrom = DateTime.Now.AddDays(-2);
 
-                var dateTo = DateTime.Now.AddDays(-1);
-
-                await _omsEnvioService.Sync(dateFrom, dateTo);
+                await _omsEnvioService.Sync(dateFrom);
             }
         }
 

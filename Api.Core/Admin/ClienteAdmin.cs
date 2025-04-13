@@ -184,9 +184,9 @@ namespace Api.Core.Admin
                         clienteImpuesto.UpdatedBy = CurrentUser?.user_id;
                     }
                 }
-
+                //PSD FIX005 - Asigno el vacio al email
                 entity.Nombre = dto.Nombre;
-                entity.Email = dto.Email;
+                entity.Email = dto.Email ?? " ";
                 entity.Telefono = dto.Telefono;
                 entity.NombreUsuario = dto.NombreUsuario;
                 entity.RazonSocial = dto.RazonSocial;

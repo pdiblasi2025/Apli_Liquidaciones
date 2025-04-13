@@ -7,7 +7,6 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Net.Http.Json;
 using Newtonsoft.Json;
-using Microsoft.Extensions.Configuration;
 
 namespace Api.Core.Services.Implementations
 {
@@ -17,20 +16,18 @@ namespace Api.Core.Services.Implementations
         private const string AUTHORIZATION = "authorization";
         private const string BEARER = "Bearer ";
         private const string LoginEndpoint = "Api/Login";
-        private const string PaymentMethodEndpoint = "Api/Values/ECL/PaymentMethodID";
-        private const string TaxTypeEndpoint = "Api/Values/ECL/TaxTypeID";
-        private const string IdentificationTypeEndpoint = "Api/Values/ECL/IdentificationTypeID";
-        private const string TaxCodeEndpoint = "Api/Values/ECL/TaxCode";
-        private const string ProductTypeIDEndpoint = "Api/Values/ECL/ProductTypeID";
-        private const string UnitOfMeasureEndpoint = "Api/Values/ECL/UnitOfMeasureID";
+        private const string PaymentMethodEndpoint = "Api/Values/LIQ/PaymentMethodID";
+        private const string TaxTypeEndpoint = "Api/Values/LIQ/TaxTypeID";
+        private const string IdentificationTypeEndpoint = "Api/Values/LIQ/IdentificationTypeID";
+        private const string TaxCodeEndpoint = "Api/Values/LIQ/TaxCode";
+        private const string ProductTypeIDEndpoint = "Api/Values/LIQ/ProductTypeID";
+        private const string UnitOfMeasureEndpoint = "Api/Values/LIQ/UnitOfMeasureID";
         private const string InvoiceEndpoint = "Api/Invoice";
-        private const string ProductCodeEndpoint = "Api/Values/ECL/ProductCode";
-        private readonly IConfiguration _configuration;
+        private const string ProductCodeEndpoint = "Api/Values/LIQ/ProductCode";
 
-        public ErpMilongaService(HttpClient httpClient, IConfiguration configuration)
+        public ErpMilongaService(HttpClient httpClient)
         {
             _httpClient = httpClient;
-            _configuration = configuration;
         }
 
         public void AddAuthorization(string token)
@@ -42,8 +39,8 @@ namespace Api.Core.Services.Implementations
         {
             var login = new ErpMilongaUserLoginDto
             {
-                UserName = _configuration["Erp:UserName"],
-                Password = _configuration["Erp:Password"]
+                UserName = "liquitest",
+                Password = "liquitest2022!"
             };
 
             var response = await _httpClient.PostAsJsonAsync(LoginEndpoint, login);

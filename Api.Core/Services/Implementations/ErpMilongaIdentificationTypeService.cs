@@ -26,7 +26,7 @@ namespace Api.Core.Services.Implementations
                        .AsNoTracking()
                        .ToListAsync();
 
-            var items = erpResponse.Where(x => !tiposDeIdentificacion.Any(cp => cp.IdentificationTypeID == x.IdentificationTypeID)).ToList();
+            var items = erpResponse.Where(x => !tiposDeIdentificacion.Any(cp => cp.IdentificationTypeID != x.IdentificationTypeID)).ToList();
 
             foreach (var item in items)
             {

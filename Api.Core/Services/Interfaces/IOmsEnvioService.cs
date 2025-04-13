@@ -5,6 +5,6 @@ namespace Api.Core.Services.Interfaces
 {
     public interface IOmsEnvioService
     {
-        Task Sync(DateTime dateFrom, DateTime? dateTo = null);
+        Task Sync(DateTime? dateFrom = null, DateTime? dateTo = null);
     }
 }
